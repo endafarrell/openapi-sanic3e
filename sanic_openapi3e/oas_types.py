@@ -55,9 +55,7 @@ def _assert_type(element: Any, types: Sequence[Any], name: str, clazz: Type[Any]
     assert isinstance(types, tuple)
     assert isinstance(name, str)
     if element is not None and not isinstance(element, types):
-        raise TypeError(
-            "Incorrect type ({}) for {}.{}, [{}]".format(type(element), clazz.__qualname__, name, types)
-        )
+        raise TypeError("Incorrect type ({}) for {}.{}, [{}]".format(type(element), clazz.__qualname__, name, types))
 
 
 def _assert_required(element, name, clazz, why=""):
@@ -137,7 +135,7 @@ class OObject:
         :return: dict
         """
         if isinstance(value, OObject):
-            return value.serialize(for_repr=for_repr, sort=sort)
+            return value.serialize(sort=sort)
 
         if isinstance(value, dict):
             return {openapi_keyname(k): OObject._serialize(v, for_repr=for_repr, sort=sort) for k, v in value.items()}
@@ -187,15 +185,15 @@ class OObject:
                 continue
             if key.startswith("x_"):
                 continue
+            if key == "deprecated" and value is False:
+                # By default, items in specs are `deprecated: false` - these are not desirable in the specs
+                continue
             key2 = openapi_keyname(key)
             value2: Union[Dict, List, str, bytes, int, float, bool]
-            if key2 == "parameters" and self.__class__.__qualname__ in ("PathItem", "Operation",):
-                value2 = [
-                    OObject._as_yamlable_dict(
-                        e, sort=sort, opt_key=f"{opt_key}.{key2}"
-                    )
-                    for e in value
-                ]
+            if value is False or value is True:
+                value2 = value
+            elif key2 == "parameters" and self.__class__.__qualname__ in ("PathItem", "Operation",):
+                value2 = [OObject.as_yamlable_object(e, sort=sort, opt_key=f"{opt_key}.{key2}") for e in value]
 
             elif key2 == "responses" and self.__class__ == Components:
                 value2 = {
@@ -215,23 +213,17 @@ class OObject:
                 value2 = OObject._as_yamlable_object(value, sort=True, opt_key=f"{opt_key}.{key2}")
             elif key2 == "paths":
                 value2 = {
-                    uri: OObject._as_yamlable_object(
-                        path_item, opt_key=f"{opt_key}.{uri}"
-                    )
-                    for uri, path_item in value._paths
+                    uri: OObject._as_yamlable_object(path_item, opt_key=f"{opt_key}.{uri}")
+                    for uri, path_item in value._paths  # pylint: disable=protected-access
                 }
             elif key2 == "examples":
                 value2 = {
                     key3: OObject._as_yamlable_object(value3, opt_key=f"{opt_key}.{key2}")
                     for key3, value3 in value.items()
                 }
-            elif key2 == "deprecated" and not value:
-                # By default, items in specs are `deprecated: false` - these are not desirable in the specs
-                continue
             else:
                 value2 = OObject._as_yamlable_object(value, opt_key=f"{opt_key}.{key2}")
-            if not value and not isinstance(value, bool):
-                continue
+
             _repr[key2] = value2
 
         if sort:
@@ -241,7 +233,7 @@ class OObject:
 
         return _repr
 
-    def serialize(self, for_repr=False, sort=False) -> OrderedDict:
+    def serialize(self, sort=False) -> OrderedDict:
         """
         Serialisation to a dict.
 
@@ -303,7 +295,7 @@ class OObject:
         return json.dumps(self.serialize(), sort_keys=True)
 
     def __repr__(self):
-        return "{}{}".format(self.__class__.__qualname__, json.dumps(self.serialize(for_repr=True), sort_keys=True),)
+        return "{}{}".format(self.__class__.__qualname__, json.dumps(self.serialize(), sort_keys=True),)
 
 
 # --------------------------------------------------------------- #
@@ -2081,9 +2073,9 @@ class Parameter(OObject):  # pylint: disable=too-many-instance-attributes
                 _d[key] = value
                 other_value = getattr(other, key)
                 if other_value and value != other_value:
-                        # TODO - this should be done recursively. Move __add__ up to OObject?
-                        # eg: schema:
-                        # Schema{"type": "integer"} != Schema{"format": "int32", "minimum": 4, "type": "integer"}
+                    # TODO - this should be done recursively. Move __add__ up to OObject?
+                    # eg: schema:
+                    # Schema{"type": "integer"} != Schema{"format": "int32", "minimum": 4, "type": "integer"}
                     if isinstance(other_value, Reference):
                         # Simple replace.
                         # TODO - check that the ref actually exists in the components.
@@ -2850,8 +2842,8 @@ class SecurityRequirement(OObject):  # pylint: disable=missing-function-docstrin
     def __repr__(self):
         return repr(self.__dict__)
 
-    def serialize(self, for_repr=False, sort=False):
-        raise NotImplementedError(sef)
+    def serialize(self, sort=False):
+        raise NotImplementedError(self)
         # return self.__dict__
 
     def __len__(self):
@@ -3277,7 +3269,7 @@ class Paths(OObject):
         else:
             raise ValueError("locked")
 
-    def serialize(self, for_repr=False, sort=False) -> OrderedDict:
+    def serialize(self, sort=False) -> OrderedDict:
         """
         Serialisation to a dict.
 

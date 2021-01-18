@@ -10,7 +10,7 @@ def test_otype():
         sanic_openapi3e.oas_types.Contact(name=2)
 
     o_contact = sanic_openapi3e.oas_types.Contact(name="name", url="url")
-    assert o_contact.serialize(for_repr=False) == {"name": "name", "url": "url"}
+    assert o_contact.serialize() == {"name": "name", "url": "url"}
 
 
 def test_asserts():
