@@ -1,0 +1,694 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "API",
+    "version": "v1.0.0",
+    "description": "Description"
+  },
+  "paths": {
+    "\/41\/test_id\/{an_id}": {
+      "get": {
+        "tags": [
+          "Tag 1"
+        ],
+        "operationId": "GET~~~41~test_id~an_id",
+        "parameters": [
+          {
+            "name": "an_id",
+            "description": "An ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#\/components\/responses\/200"
+          },
+          "400": {
+            "$ref": "#\/components\/responses\/400"
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "405": {
+            "$ref": "#\/components\/responses\/405"
+          },
+          "410": {
+            "$ref": "#\/components\/responses\/410"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        }
+      }
+    },
+    "\/47\/test_id_min\/{an_id}": {
+      "get": {
+        "operationId": "GET~~~47~test_id_min~an_id",
+        "parameters": [
+          {
+            "name": "an_id",
+            "description": "An ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#\/components\/schemas\/int.min4"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "You got a 200!",
+            "headers": {
+              "x-prize": {
+                "description": "free money"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#\/components\/responses\/400"
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "405": {
+            "$ref": "#\/components\/responses\/405"
+          },
+          "410": {
+            "$ref": "#\/components\/responses\/410"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        }
+      }
+    },
+    "\/55\/test_id_examples\/{an_id}": {
+      "get": {
+        "summary": "A path with parameter examples",
+        "description": "Unfortunately, the swagger UIs do not show the examples, but you can see them here:\n\n`{'small': Example{\"description\": \"Desc: Numbers less than ten\", \"summary\": \"A small number\", \"value\": 7}, 'big': Example{\"description\": \"Desc: Numbers more than one million!\", \"summary\": \"A big number\", \"value\": 123456789}}`",
+        "operationId": "GET~~~55~test_id_examples~an_id",
+        "parameters": [
+          {
+            "name": "an_id",
+            "description": "An ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "minimum": 4,
+              "type": "integer",
+              "description": "Minimum value: 4",
+              "format": "int32"
+            },
+            "examples": {
+              "small": {
+                "summary": "A small number",
+                "description": "Desc: Numbers less than ten",
+                "value": 7
+              },
+              "big": {
+                "summary": "A big number",
+                "description": "Desc: Numbers more than one million!",
+                "value": 123456789
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#\/components\/responses\/200"
+          },
+          "400": {
+            "$ref": "#\/components\/responses\/400"
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "405": {
+            "$ref": "#\/components\/responses\/405"
+          },
+          "410": {
+            "$ref": "#\/components\/responses\/410"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        }
+      }
+    },
+    "\/74\/test_path__deprecated\/{an_id}\/{another}": {
+      "get": {
+        "summary": "A path with parameter examples",
+        "description": "This should be marked as being deprecated",
+        "operationId": "GET~~~74~test_path__deprecated~an_id~another",
+        "parameters": [
+          {
+            "name": "an_id",
+            "description": "An ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "minimum": 4,
+              "type": "integer",
+              "description": "Minimum value: 4",
+              "format": "int32"
+            },
+            "examples": {
+              "small": {
+                "summary": "A small number",
+                "description": "Desc: Numbers less than ten",
+                "value": 7
+              },
+              "big": {
+                "summary": "A big number",
+                "description": "Desc: Numbers more than one million!",
+                "value": 123456789
+              }
+            }
+          },
+          {
+            "name": "another",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#\/components\/responses\/200"
+          },
+          "400": {
+            "$ref": "#\/components\/responses\/400"
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "405": {
+            "$ref": "#\/components\/responses\/405"
+          },
+          "410": {
+            "$ref": "#\/components\/responses\/410"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "\/90\/test_parameter__deprecated\/{an_id}": {
+      "get": {
+        "summary": "A path deprecated parameter",
+        "description": "The parameter should be marked as deprecated",
+        "operationId": "GET~~~90~test_parameter__deprecated~an_id",
+        "parameters": [
+          {
+            "name": "an_id",
+            "description": "An ID",
+            "in": "path",
+            "required": true,
+            "deprecated": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#\/components\/responses\/200"
+          },
+          "400": {
+            "$ref": "#\/components\/responses\/400"
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "405": {
+            "$ref": "#\/components\/responses\/405"
+          },
+          "410": {
+            "$ref": "#\/components\/responses\/410"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        }
+      }
+    },
+    "\/109\/some_ids": {
+      "get": {
+        "operationId": "testSomeIds",
+        "parameters": [
+          {
+            "name": "ids",
+            "description": "Some IDs",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                1,
+                3,
+                5,
+                7,
+                11,
+                13
+              ],
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#\/components\/responses\/200"
+          },
+          "400": {
+            "$ref": "#\/components\/responses\/400"
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "405": {
+            "$ref": "#\/components\/responses\/405"
+          },
+          "410": {
+            "$ref": "#\/components\/responses\/410"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        }
+      }
+    },
+    "\/123\/post_some_ids": {
+      "post": {
+        "operationId": "testPostSomeIds",
+        "parameters": [
+          {
+            "name": "ids",
+            "description": "Some IDs",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                1,
+                3,
+                5,
+                7,
+                11,
+                13
+              ],
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#\/components\/responses\/200"
+          },
+          "400": {
+            "$ref": "#\/components\/responses\/400"
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "405": {
+            "$ref": "#\/components\/responses\/405"
+          },
+          "410": {
+            "$ref": "#\/components\/responses\/410"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        }
+      }
+    },
+    "\/137\/put_some_ids": {
+      "put": {
+        "operationId": "testPutSomeIds",
+        "parameters": [
+          {
+            "name": "ids",
+            "description": "Some IDs",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                1,
+                3,
+                5,
+                7,
+                11,
+                13
+              ],
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#\/components\/responses\/200"
+          },
+          "400": {
+            "$ref": "#\/components\/responses\/400"
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "405": {
+            "$ref": "#\/components\/responses\/405"
+          },
+          "410": {
+            "$ref": "#\/components\/responses\/410"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        }
+      }
+    },
+    "\/151\/options_some_ids": {
+      "options": {
+        "operationId": "testOptionsSomeIds",
+        "parameters": [
+          {
+            "name": "ids",
+            "description": "Some IDs",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                1,
+                3,
+                5,
+                7,
+                11,
+                13
+              ],
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#\/components\/responses\/200"
+          },
+          "400": {
+            "$ref": "#\/components\/responses\/400"
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "405": {
+            "$ref": "#\/components\/responses\/405"
+          },
+          "410": {
+            "$ref": "#\/components\/responses\/410"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        }
+      }
+    },
+    "\/165\/delete_some_ids": {
+      "delete": {
+        "operationId": "testDeleteSomeIds",
+        "parameters": [
+          {
+            "name": "ids",
+            "description": "Some IDs",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                1,
+                3,
+                5,
+                7,
+                11,
+                13
+              ],
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#\/components\/responses\/200"
+          },
+          "400": {
+            "$ref": "#\/components\/responses\/400"
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "405": {
+            "$ref": "#\/components\/responses\/405"
+          },
+          "410": {
+            "$ref": "#\/components\/responses\/410"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        }
+      }
+    },
+    "\/179\/head_some_ids": {
+      "head": {
+        "operationId": "testHeadSomeIds",
+        "parameters": [
+          {
+            "name": "ids",
+            "description": "Some IDs",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                1,
+                3,
+                5,
+                7,
+                11,
+                13
+              ],
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#\/components\/responses\/200"
+          },
+          "400": {
+            "$ref": "#\/components\/responses\/400"
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "405": {
+            "$ref": "#\/components\/responses\/405"
+          },
+          "410": {
+            "$ref": "#\/components\/responses\/410"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        }
+      }
+    },
+    "\/194\/patch_some_ids": {
+      "patch": {
+        "operationId": "PATCH~~~194~patch_some_ids",
+        "parameters": [
+          {
+            "name": "ids",
+            "description": "Some IDs",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                1,
+                3,
+                5,
+                7,
+                11,
+                13
+              ],
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#\/components\/responses\/200"
+          },
+          "400": {
+            "$ref": "#\/components\/responses\/400"
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "405": {
+            "$ref": "#\/components\/responses\/405"
+          },
+          "410": {
+            "$ref": "#\/components\/responses\/410"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "str.min4": {
+        "title": "str.min4",
+        "minimum": 4,
+        "type": "string",
+        "description": "A string of len >= 4"
+      },
+      "int.min4": {
+        "title": "int.min4",
+        "minimum": 4,
+        "type": "integer",
+        "description": "Minimum: 4",
+        "format": "int32"
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "OK"
+      },
+      "400": {
+        "description": "Bad Request"
+      },
+      "401": {
+        "description": "Unauthorized"
+      },
+      "403": {
+        "description": "Forbidden"
+      },
+      "404": {
+        "description": "Not Found"
+      },
+      "405": {
+        "description": "Method Not Allowed"
+      },
+      "410": {
+        "description": "Gone"
+      },
+      "500": {
+        "description": "Internal Server Error"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Tag 1",
+      "description": "A tag desc"
+    }
+  ]
+}

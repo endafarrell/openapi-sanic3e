@@ -151,7 +151,7 @@ def _build_openapi_spec(  # pylint: disable=too-many-arguments,too-many-locals,t
 
     # We may reuse this later
     assert callable(operation_id_fn), operation_id_fn
-    components = app.config.get("OPENAPI_COMPONENTS", None)
+    components = app.config.get("OPENAPI_COMPONENTS")
     if components:
         if not isinstance(components, Components):
             raise AssertionError(
@@ -314,7 +314,7 @@ def _build_openapi_spec(  # pylint: disable=too-many-arguments,too-many-locals,t
     _v3_paths: Paths = Paths(_oas_paths)
     _v3_tags = _build_openapi_tags(_oas_paths, show_unused_tags)
 
-    servers = app.config.get("OPENAPI_SERVERS", None)
+    servers = app.config.get("OPENAPI_SERVERS")
     if servers:
         if not isinstance(servers, list):
             raise AssertionError(
@@ -326,7 +326,7 @@ def _build_openapi_spec(  # pylint: disable=too-many-arguments,too-many-locals,t
                     "You app.config's `OPENAPI_SERVERS` server `{}` is not a `Server`: {}".format(server, type(server))
                 )
 
-    security = app.config.get("OPENAPI_SECURITY", None)
+    security = app.config.get("OPENAPI_SECURITY")
     if security:
         if not isinstance(security, list):
             raise AssertionError(
@@ -342,7 +342,7 @@ def _build_openapi_spec(  # pylint: disable=too-many-arguments,too-many-locals,t
                     )
                 )
 
-    external_docs = app.config.get("OPENAPI_EXTERNAL_DOCS", None)
+    external_docs = app.config.get("OPENAPI_EXTERNAL_DOCS")
     if external_docs:
         if not isinstance(external_docs, ExternalDocumentation):
             raise AssertionError(

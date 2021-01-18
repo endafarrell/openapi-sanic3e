@@ -93,5 +93,4 @@ def run_asserts(
         # Not covered as we really don't want failures ;-)
         print("\n   actual:", actual_str)  # pragma: no cover
         print("expected:", expected_str)  # pragma: no cover
-
-    assert json.loads(actual_str) == json.loads(expected_str)
+        assert actual_str == expected_str

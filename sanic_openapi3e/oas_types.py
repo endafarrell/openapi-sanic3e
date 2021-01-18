@@ -184,7 +184,7 @@ class OObject:
             raise TypeError(repr(self))
 
         for key, value in self.__dict__.items():
-            if value is None:
+            if not value and not isinstance(value, bool):
                 continue
             if key.startswith("x_"):
                 continue
@@ -218,7 +218,7 @@ class OObject:
                 }
             else:
                 value2 = OObject._as_yamlable_dict(value, opt_key=f"{opt_key}.{key2}")
-            if value2 is None:
+            if not value and not isinstance(value, bool):
                 continue
             _repr[key2] = value2
 
@@ -239,7 +239,9 @@ class OObject:
         _repr = OrderedDict()  # type: OrderedDict[str, Union[Dict, List]]
         for key, value in self.__dict__.items():
 
-            if value is None or value == [] or callable(value):
+            if callable(value):
+                continue
+            if not value and not isinstance(value, bool):
                 continue
             if key.startswith("x_") and not for_repr:
                 continue
@@ -2043,7 +2045,6 @@ class Parameter(OObject):  # pylint: disable=too-many-instance-attributes
         """
 
     def __add__(self, other):
-        print(2045, self, other)
         assert isinstance(other, Parameter)
         _d = dict()
         for key, value in self.__dict__.items():  # pylint: disable=too-many-nested-blocks
