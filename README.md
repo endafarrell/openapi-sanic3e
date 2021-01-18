@@ -396,3 +396,39 @@ spec at `/openapi/spec.all.json` is created. You generally won't want
 these to be on your production deployment, but you may want it for dev
 and test purposes. 
 
+# OAS Object maturity
+`sanic-openapi3e` is being used in production, and all of the spec is implemented. Most of the spec is known to be in
+production use, but some of the spec's objects are marked here as "beta" due to no known production use.
+
+| Class | sanic-openapi3e maturity | notes |
+|---|---|---|
+Callback | beta | no known usage
+Components | production/stable |  |
+Contact | production/stable |  |
+Discriminator | beta | no known usage
+Encoding | stable | no known usage |
+Example | production/stable |  |
+ExternalDocumentation | beta | no known usage
+Header | beta | no known usage
+Info | production/stable |  |
+License | production/stable |  |
+Link | beta | no known usage
+MediaType | production/stable |  |
+OAuthFlow | production/stable |  |
+OAuthFlows | production/stable |  |
+OpenAPIv3 | production/stable |  |
+Operation | production/stable |  |
+Parameter | production/stable |  |
+PathItem | production/stable |  |
+Paths | production/stable |  |
+Reference | production/stable |  |
+RequestBody | production/stable |  |
+Response | production/stable |  |
+Responses | production/stable |  |
+Schema | production/stable |  |
+SecurityRequirement | beta | no known usage
+SecurityScheme | production/stable |  |
+Server | production/stable |  |
+ServerVariable | beta | no known usage
+Tag | production/stable |  |
+XML | beta | no known usage

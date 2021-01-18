@@ -55,9 +55,10 @@ def _assert_type(element: Any, types: Sequence[Any], name: str, clazz: Type[Any]
     assert isinstance(types, tuple)
     assert isinstance(name, str)
     if element is not None:
-        assert isinstance(element, types), "Incorrect type ({}) for {}.{}, [{}]".format(
-            type(element), clazz.__qualname__, name, types
-        )
+        if not isinstance(element, types):
+            raise TypeError(
+                "Incorrect type ({}) for {}.{}, [{}]".format(type(element), clazz.__qualname__, name, types)
+            )
 
 
 def _assert_required(element, name, clazz, why=""):
@@ -183,12 +184,12 @@ class OObject:
             raise TypeError(repr(self))
 
         for key, value in self.__dict__.items():
-            if not value:
+            if value is None:
                 continue
             if key.startswith("x_"):
                 continue
             key2 = openapi_keyname(key)
-            value2: Union[Dict, List, str, bytes, int, float]
+            value2: Union[Dict, List, str, bytes, int, float, bool]
             if key2 == "parameters" and self.__class__.__qualname__ in ("PathItem", "Operation",):
                 value2 = list(OObject._as_yamlable_dict(e, sort=sort, opt_key=f"{opt_key}.{key2}") for e in value)
             elif key2 == "responses" and self.__class__ == Components:
@@ -217,7 +218,7 @@ class OObject:
                 }
             else:
                 value2 = OObject._as_yamlable_dict(value, opt_key=f"{opt_key}.{key2}")
-            if not value2:
+            if value2 is None:
                 continue
             _repr[key2] = value2
 
@@ -286,74 +287,74 @@ class OType(OObject):
     formats: List[str] = []
 
 
-class OInteger(OType):
-    """A sanic_openapi3e class to hold OpenAPI integer types of formats `int32` and/or `int64`."""
-
-    name = "integer"
-    formats = ["int32", "int64"]
-
-    def __init__(self, value: int, _format: Optional[str] = None):
-        if _format:
-            assert _format in self.formats
-        self.format = _format
-        self.value = value
-
-    def serialise(self) -> int:
-        return self.value
-
-
-class ONumber(OType):
-    """A sanic_openapi3e class to hold OpenAPI non-integer numeric types of formats `float` and `double`."""
-
-    name = "number"
-    formats = ["float", "double"]
-
-    def __init__(self, value: float, _format: Optional[str] = None):
-        if _format:
-            assert _format in self.formats
-        self.format = _format
-        self.value = value
-
-    def serialise(self) -> float:
-        return self.value
+# class OInteger(OType):
+#     """A sanic_openapi3e class to hold OpenAPI integer types of formats `int32` and/or `int64`."""
+#
+#     name = "integer"
+#     formats = ["int32", "int64"]
+#
+#     def __init__(self, value: int, _format: Optional[str] = None):
+#         if _format:
+#             assert _format in self.formats
+#         self.format = _format
+#         self.value = value
+#
+#     def serialise(self) -> int:
+#         return self.value
 
 
-class OString(OType):
-    """
-    A sanic_openapi3e class to hold OpenAPI string types of formats `byte`, `binary`, `date`, `date-time` and
-    `password`.
-    """
-
-    name = "string"
-    formats = ["byte", "binary", "date", "date-time", "password"]
-
-    def __init__(self, value: str, _format: Optional[str] = None):
-        if _format:
-            assert _format in self.formats
-        self.format = _format
-        self.value = value
-
-    def serialise(self) -> str:
-        return self.value
+# class ONumber(OType):
+#     """A sanic_openapi3e class to hold OpenAPI non-integer numeric types of formats `float` and `double`."""
+#
+#     name = "number"
+#     formats = ["float", "double"]
+#
+#     def __init__(self, value: float, _format: Optional[str] = None):
+#         if _format:
+#             assert _format in self.formats
+#         self.format = _format
+#         self.value = value
+#
+#     def serialise(self) -> float:
+#         return self.value
 
 
-class OBoolean(OType):
-    """
-    A sanic_openapi3e class to hold OpenAPI string types of formats `byte`, `binary`, `date`, `date-time` and
-    `password`.
-    """
+# class OString(OType):
+#     """
+#     A sanic_openapi3e class to hold OpenAPI string types of formats `byte`, `binary`, `date`, `date-time` and
+#     `password`.
+#     """
+#
+#     name = "string"
+#     formats = ["byte", "binary", "date", "date-time", "password"]
+#
+#     def __init__(self, value: str, _format: Optional[str] = None):
+#         if _format:
+#             assert _format in self.formats
+#         self.format = _format
+#         self.value = value
+#
+#     def serialise(self) -> str:
+#         return self.value
 
-    name = "boolean"
-    formats: List[str] = []
 
-    def __init__(self, value: bool, _format: Optional[str] = None):
-        if _format:
-            assert _format in self.formats
-        self.format = _format
-        self.value = value
-
-    def serialise(self) -> bool:
-        return self.value
+# class OBoolean(OType):
+#     """
+#     A sanic_openapi3e class to hold OpenAPI string types of formats `byte`, `binary`, `date`, `date-time` and
+#     `password`.
+#     """
+#
+#     name = "boolean"
+#     formats: List[str] = []
+#
+#     def __init__(self, value: bool, _format: Optional[str] = None):
+#         if _format:
+#             assert _format in self.formats
+#         self.format = _format
+#         self.value = value
+#
+#     def serialise(self) -> bool:
+#         return self.value
 
 
 # OTypeFormats: Dict[str, List[str]] = {
