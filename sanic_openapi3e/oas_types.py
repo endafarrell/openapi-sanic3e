@@ -192,14 +192,11 @@ class OObject:
             value2: Union[Dict, List, str, bytes, int, float, bool]
             if value is False or value is True:
                 value2 = value
-            elif key2 == "parameters" and self.__class__.__qualname__ in ("PathItem", "Operation",):
-                value2 = [OObject.as_yamlable_object(e, sort=sort, opt_key=f"{opt_key}.{key2}") for e in value]
 
-            elif key2 == "responses" and self.__class__ == Components:
-                value2 = {
-                    key: value.as_yamlable_object(opt_key=f"{opt_key}.{key2}")
-                    for key, value in Responses.DEFAULT_RESPONSES.items()
-                }
+            ############################################################################################################
+            # List of yamlable objects for element in value
+            elif key2 == "parameters" and self.__class__ in (PathItem, Operation):
+                value2 = [OObject.as_yamlable_object(e, sort=sort, opt_key=f"{opt_key}.{key2}") for e in value]
             elif key2 == "security":
                 value2 = [
                     SecurityRequirement._as_yamlable_object(  # pylint: disable=protected-access
@@ -207,20 +204,33 @@ class OObject:
                     )
                     for sr in value
                 ]
-
-            elif key2 == "schemas":
-                # Everyone wants sorted schema entries!
-                value2 = OObject._as_yamlable_object(value, sort=True, opt_key=f"{opt_key}.{key2}")
-            elif key2 == "paths":
+            ############################################################################################################
+            # dicts of yamlable objects for items() value
+            elif key2 == "responses" and self.__class__ == Components:
                 value2 = {
-                    uri: OObject._as_yamlable_object(path_item, opt_key=f"{opt_key}.{uri}")
-                    for uri, path_item in value._paths  # pylint: disable=protected-access
+                    key: value.as_yamlable_object(opt_key=f"{opt_key}.{key2}")
+                    for key, value in Responses.DEFAULT_RESPONSES.items()
                 }
+
             elif key2 == "examples":
                 value2 = {
                     key3: OObject._as_yamlable_object(value3, opt_key=f"{opt_key}.{key2}")
                     for key3, value3 in value.items()
                 }
+            ############################################################################################################
+            # paths are a special case
+            elif key2 == "paths":
+                value2 = {
+                    uri: OObject._as_yamlable_object(path_item, opt_key=f"{opt_key}.{uri}")
+                    for uri, path_item in value._paths  # pylint: disable=protected-access
+                }
+            ############################################################################################################
+            # sort the schemas
+            elif key2 == "schemas":
+                # Everyone wants sorted schema entries!
+                value2 = OObject._as_yamlable_object(value, sort=True, opt_key=f"{opt_key}.{key2}")
+            ############################################################################################################
+            # default
             else:
                 value2 = OObject._as_yamlable_object(value, opt_key=f"{opt_key}.{key2}")
 
