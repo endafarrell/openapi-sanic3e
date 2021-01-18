@@ -89,7 +89,7 @@ def run_asserts(
 
     actual_str = json.dumps(spec, sort_keys=True)
     expected_str = json.dumps(expected, sort_keys=True)
-    if not actual_str == expected_str:
+    if actual_str != expected_str:
         # Not covered as we really don't want failures ;-)
         print("\n   actual:", actual_str)  # pragma: no cover
         print("expected:", expected_str)  # pragma: no cover
