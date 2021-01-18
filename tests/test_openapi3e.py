@@ -1,7 +1,5 @@
 """Basic tests for the openapi_blueprint."""
 import json
-import sys
-from typing import Dict, Union
 
 import pytest
 import sanic.request
@@ -120,122 +118,15 @@ def test_fundamentals(openapi__mod_bp_doc):
                             "in": "path",
                             "name": "an_id",
                             "required": true,
-                            "schema": {"type": "integer"},
-                        }
-                    ],
-                    "responses": {
-                        "200": {"$ref": "#/components/responses/200"},
-                        "400": {"$ref": "#/components/responses/400"},
-                        "401": {"$ref": "#/components/responses/401"},
-                        "403": {"$ref": "#/components/responses/403"},
-                        "404": {"$ref": "#/components/responses/404"},
-                        "405": {"$ref": "#/components/responses/405"},
-                        "410": {"$ref": "#/components/responses/410"},
-                        "500": {"$ref": "#/components/responses/500"},
-                    },
-                }
-            }
-        },
-    }
-
-    run_asserts(response, expected)
-
-
-def test_path_integer_min(openapi__mod_bp_doc):
-    _, openapi_blueprint, doc = openapi__mod_bp_doc
-    app = Sanic("test_consumes_from_path_does_not_duplicate_parameters", strict_slashes=strict_slashes,)
-
-    app.blueprint(openapi_blueprint)
-
-    @app.get("/test/148/anId/<an_id:int>")
-    @doc.parameter(name="an_id", description="An ID", required=True, _in="path", schema=int_min_4)
-    def test_id(request, an_id: int):
-        return sanic.response.json(locals())  # pragma: no cover
-
-    _, response = app.test_client.get("/openapi/spec.json")
-    expected = {
-        "info": {"description": "Description", "title": "API", "version": "v1.0.0"},
-        "openapi": "3.0.2",
-        "paths": {
-            "/test/148/anId/{an_id}": {
-                "get": {
-                    "operationId": "GET~~~test~148~anId~an_id",
-                    "parameters": [
-                        {
-                            "description": "An ID",
-                            "in": "path",
-                            "name": "an_id",
-                            "required": true,
-                            "schema": {"description": "Minimum: 4", "format": "int32", "minimum": 4, "type": "integer"},
-                        }
-                    ],
-                    "responses": {
-                        "200": {"$ref": "#/components/responses/200"},
-                        "400": {"$ref": "#/components/responses/400"},
-                        "401": {"$ref": "#/components/responses/401"},
-                        "403": {"$ref": "#/components/responses/403"},
-                        "404": {"$ref": "#/components/responses/404"},
-                        "405": {"$ref": "#/components/responses/405"},
-                        "410": {"$ref": "#/components/responses/410"},
-                        "500": {"$ref": "#/components/responses/500"},
-                    },
-                }
-            }
-        },
-    }
-
-    run_asserts(response, expected)
-
-
-def test_path_integer_examples_w_summary_and_description(openapi__mod_bp_doc):
-    openapi_mod, openapi_blueprint, doc = openapi__mod_bp_doc
-    app = Sanic("test_path_integer_examples_w_summary_and_description", strict_slashes=strict_slashes,)
-    app.config.OPENAPI_OPERATION_ID_FN = openapi_mod.camel_case_operation_id_fn
-
-    app.blueprint(openapi_blueprint)
-
-    @app.get("/examples/195/test_id_examples/<an_id:int>")
-    @doc.parameter(
-        name="an_id",
-        description="An ID",
-        required=True,
-        _in="path",
-        schema=int_min_4,
-        examples={"small": an_id_ex1, "big": an_id_ex2},
-    )
-    @doc.summary("A path with parameter examples")
-    @doc.description("Swagger UIs do not show examples")
-    def test_id_examples(request, an_id: int):
-        return sanic.response.json(locals())  # pragma: no cover
-
-    _, response = app.test_client.get("/openapi/spec.json")
-    expected = {
-        "info": {"description": "Description", "title": "API", "version": "v1.0.0"},
-        "openapi": "3.0.2",
-        "paths": {
-            "/examples/195/test_id_examples/{an_id}": {
-                "get": {
-                    "description": "Swagger UIs do not show examples",
-                    "operationId": "testIdExamples",
-                    "parameters": [
-                        {
-                            "description": "An ID",
-                            "examples": {
-                                "big": {
-                                    "description": "description: Numbers more than one million!",
-                                    "summary": "A big number",
-                                    "value": 123456789,
-                                },
-                                "small": {
-                                    "description": "description: Numbers less than ten",
-                                    "summary": "A small number",
-                                    "value": 7,
-                                },
+                            "schema": {
+                                "exclusiveMaximum": false,
+                                "exclusiveMinimum": false,
+                                "nullable": false,
+                                "readOnly": false,
+                                "type": "integer",
+                                "uniqueItems": false,
+                                "writeOnly": false,
                             },
-                            "in": "path",
-                            "name": "an_id",
-                            "required": true,
-                            "schema": {"description": "Minimum: 4", "format": "int32", "minimum": 4, "type": "integer"},
                         }
                     ],
                     "responses": {
@@ -248,7 +139,6 @@ def test_path_integer_examples_w_summary_and_description(openapi__mod_bp_doc):
                         "410": {"$ref": "#/components/responses/410"},
                         "500": {"$ref": "#/components/responses/500"},
                     },
-                    "summary": "A path with parameter examples",
                 }
             }
         },
@@ -308,9 +198,15 @@ def test_path__deprecated(openapi__mod_bp_doc):
                             "required": true,
                             "schema": {
                                 "description": "Minimum: 4",
+                                "exclusiveMaximum": false,
+                                "exclusiveMinimum": false,
                                 "format": "int32",
                                 "minimum": 4,
+                                "nullable": false,
+                                "readOnly": false,
                                 "type": "integer",
+                                "uniqueItems": false,
+                                "writeOnly": false,
                             },
                         }
                     ],
@@ -325,64 +221,6 @@ def test_path__deprecated(openapi__mod_bp_doc):
                         "500": {"$ref": "#/components/responses/500"},
                     },
                     "summary": "A path with parameter examples",
-                }
-            }
-        },
-    }
-
-    run_asserts(response, expected)
-
-
-def test_parameter__deprecated(openapi__mod_bp_doc):
-    _, openapi_blueprint, doc = openapi__mod_bp_doc
-    app = Sanic("test_parameter__deprecated", strict_slashes=strict_slashes)
-
-    app.blueprint(openapi_blueprint)
-
-    @app.get("/examples/327/test_parameter__deprecated/<an_id:int>")
-    @doc.parameter(
-        name="an_id",
-        description="An ID",
-        required=True,
-        _in="path",
-        schema=sanic_openapi3e.oas_types.Schema.Integer,
-        deprecated=True,  # <<-- detail under test
-    )
-    @doc.summary("A path deprecated parameter")
-    @doc.description("The parameter should be marked as deprecated")
-    def param__deprecated(request, an_id: int):
-        return sanic.response.json(locals())  # pragma: no cover
-
-    _, response = app.test_client.get("/openapi/spec.json")
-    expected = {
-        "info": {"description": "Description", "title": "API", "version": "v1.0.0"},
-        "openapi": "3.0.2",
-        "paths": {
-            "/examples/327/test_parameter__deprecated/{an_id}": {
-                "get": {
-                    "description": "The parameter should be marked as deprecated",
-                    "operationId": "GET~~~examples~327~test_parameter__deprecated~an_id",
-                    "parameters": [
-                        {
-                            "deprecated": true,
-                            "description": "An ID",
-                            "in": "path",
-                            "name": "an_id",
-                            "required": true,
-                            "schema": {"type": "integer"},
-                        }
-                    ],
-                    "responses": {
-                        "200": {"$ref": "#/components/responses/200"},
-                        "400": {"$ref": "#/components/responses/400"},
-                        "401": {"$ref": "#/components/responses/401"},
-                        "403": {"$ref": "#/components/responses/403"},
-                        "404": {"$ref": "#/components/responses/404"},
-                        "405": {"$ref": "#/components/responses/405"},
-                        "410": {"$ref": "#/components/responses/410"},
-                        "500": {"$ref": "#/components/responses/500"},
-                    },
-                    "summary": "A path deprecated parameter",
                 }
             }
         },
@@ -470,7 +308,25 @@ def test_list_is_a_list_in_query(openapi__mod_bp_doc):
                             "in": "query",
                             "name": "an_id",
                             "required": true,
-                            "schema": {"enum": [1, 3, 5, 7, 11, 13], "items": {"type": "integer"}, "type": "array"},
+                            "schema": {
+                                "enum": [1, 3, 5, 7, 11, 13],
+                                "exclusiveMaximum": false,
+                                "exclusiveMinimum": false,
+                                "items": {
+                                    "exclusiveMaximum": false,
+                                    "exclusiveMinimum": false,
+                                    "nullable": false,
+                                    "readOnly": false,
+                                    "type": "integer",
+                                    "uniqueItems": false,
+                                    "writeOnly": false,
+                                },
+                                "nullable": false,
+                                "readOnly": false,
+                                "type": "array",
+                                "uniqueItems": false,
+                                "writeOnly": false,
+                            },
                         }
                     ],
                     "responses": {
@@ -516,7 +372,22 @@ def test_path_without_parameter(openapi__mod_bp_doc):
             "/test/798/anId/{an_id}": {
                 "get": {
                     "operationId": "GET~~~test~798~anId~an_id",
-                    "parameters": [{"in": "path", "name": "an_id", "required": true, "schema": {"type": "integer"}}],
+                    "parameters": [
+                        {
+                            "in": "path",
+                            "name": "an_id",
+                            "required": true,
+                            "schema": {
+                                "exclusiveMaximum": false,
+                                "exclusiveMinimum": false,
+                                "nullable": false,
+                                "readOnly": false,
+                                "type": "integer",
+                                "uniqueItems": false,
+                                "writeOnly": false,
+                            },
+                        }
+                    ],
                     "responses": {
                         "200": {"$ref": "#/components/responses/200"},
                         "400": {"$ref": "#/components/responses/400"},
@@ -570,7 +441,16 @@ def test_path_exclude(openapi__mod_bp_doc):
                             "in": "path",
                             "name": "an_id",
                             "required": true,
-                            "schema": {"enum": [1, 3, 5, 7, 11, 13], "type": "integer"},
+                            "schema": {
+                                "enum": [1, 3, 5, 7, 11, 13],
+                                "exclusiveMaximum": false,
+                                "exclusiveMinimum": false,
+                                "nullable": false,
+                                "readOnly": false,
+                                "type": "integer",
+                                "uniqueItems": false,
+                                "writeOnly": false,
+                            },
                         }
                     ],
                     "responses": {
@@ -630,7 +510,16 @@ def test_path_methods(openapi__mod_bp_doc):
                             "in": "path",
                             "name": "an_id",
                             "required": true,
-                            "schema": {"enum": [1, 3, 5, 7, 11, 13], "type": "integer"},
+                            "schema": {
+                                "enum": [1, 3, 5, 7, 11, 13],
+                                "exclusiveMaximum": false,
+                                "exclusiveMinimum": false,
+                                "nullable": false,
+                                "readOnly": false,
+                                "type": "integer",
+                                "uniqueItems": false,
+                                "writeOnly": false,
+                            },
                         }
                     ],
                     "responses": {
@@ -652,7 +541,16 @@ def test_path_methods(openapi__mod_bp_doc):
                             "in": "path",
                             "name": "an_id",
                             "required": true,
-                            "schema": {"enum": [1, 3, 5, 7, 11, 13], "type": "integer"},
+                            "schema": {
+                                "enum": [1, 3, 5, 7, 11, 13],
+                                "exclusiveMaximum": false,
+                                "exclusiveMinimum": false,
+                                "nullable": false,
+                                "readOnly": false,
+                                "type": "integer",
+                                "uniqueItems": false,
+                                "writeOnly": false,
+                            },
                         }
                     ],
                     "responses": {
@@ -674,7 +572,16 @@ def test_path_methods(openapi__mod_bp_doc):
                             "in": "path",
                             "name": "an_id",
                             "required": true,
-                            "schema": {"enum": [1, 3, 5, 7, 11, 13], "type": "integer"},
+                            "schema": {
+                                "enum": [1, 3, 5, 7, 11, 13],
+                                "exclusiveMaximum": false,
+                                "exclusiveMinimum": false,
+                                "nullable": false,
+                                "readOnly": false,
+                                "type": "integer",
+                                "uniqueItems": false,
+                                "writeOnly": false,
+                            },
                         }
                     ],
                     "responses": {
@@ -696,7 +603,16 @@ def test_path_methods(openapi__mod_bp_doc):
                             "in": "path",
                             "name": "an_id",
                             "required": true,
-                            "schema": {"enum": [1, 3, 5, 7, 11, 13], "type": "integer"},
+                            "schema": {
+                                "enum": [1, 3, 5, 7, 11, 13],
+                                "exclusiveMaximum": false,
+                                "exclusiveMinimum": false,
+                                "nullable": false,
+                                "readOnly": false,
+                                "type": "integer",
+                                "uniqueItems": false,
+                                "writeOnly": false,
+                            },
                         }
                     ],
                     "responses": {
@@ -794,7 +710,16 @@ def test_camel_case_operation_id(openapi__mod_bp_doc):
                             "in": "path",
                             "name": "an_id",
                             "required": true,
-                            "schema": {"enum": [1, 3, 5, 7, 11, 13], "type": "integer"},
+                            "schema": {
+                                "enum": [1, 3, 5, 7, 11, 13],
+                                "exclusiveMaximum": false,
+                                "exclusiveMinimum": false,
+                                "nullable": false,
+                                "readOnly": false,
+                                "type": "integer",
+                                "uniqueItems": false,
+                                "writeOnly": false,
+                            },
                         }
                     ],
                     "responses": {
@@ -843,7 +768,16 @@ def test_camel_case_operation_id_for_composite_view(openapi__mod_bp_doc):
                             "in": "path",
                             "name": "an_id",
                             "required": true,
-                            "schema": {"enum": [1, 3, 5, 7, 11, 13], "type": "integer"},
+                            "schema": {
+                                "enum": [1, 3, 5, 7, 11, 13],
+                                "exclusiveMaximum": false,
+                                "exclusiveMinimum": false,
+                                "nullable": false,
+                                "readOnly": false,
+                                "type": "integer",
+                                "uniqueItems": false,
+                                "writeOnly": false,
+                            },
                         }
                     ],
                     "responses": {
@@ -865,7 +799,16 @@ def test_camel_case_operation_id_for_composite_view(openapi__mod_bp_doc):
                             "in": "path",
                             "name": "an_id",
                             "required": true,
-                            "schema": {"enum": [1, 3, 5, 7, 11, 13], "type": "integer"},
+                            "schema": {
+                                "enum": [1, 3, 5, 7, 11, 13],
+                                "exclusiveMaximum": false,
+                                "exclusiveMinimum": false,
+                                "nullable": false,
+                                "readOnly": false,
+                                "type": "integer",
+                                "uniqueItems": false,
+                                "writeOnly": false,
+                            },
                         }
                     ],
                     "responses": {
@@ -887,7 +830,16 @@ def test_camel_case_operation_id_for_composite_view(openapi__mod_bp_doc):
                             "in": "path",
                             "name": "an_id",
                             "required": true,
-                            "schema": {"enum": [1, 3, 5, 7, 11, 13], "type": "integer"},
+                            "schema": {
+                                "enum": [1, 3, 5, 7, 11, 13],
+                                "exclusiveMaximum": false,
+                                "exclusiveMinimum": false,
+                                "nullable": false,
+                                "readOnly": false,
+                                "type": "integer",
+                                "uniqueItems": false,
+                                "writeOnly": false,
+                            },
                         }
                     ],
                     "responses": {

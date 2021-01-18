@@ -14,7 +14,6 @@ paths:
         description: An ID
         in: path
         required: true
-        deprecated: false
         schema:
           exclusiveMaximum: false
           exclusiveMinimum: false
@@ -23,7 +22,6 @@ paths:
           nullable: false
           readOnly: false
           writeOnly: false
-          deprecated: false
       responses:
         '200':
           $ref: '#/components/responses/200'
@@ -41,7 +39,6 @@ paths:
           $ref: '#/components/responses/410'
         '500':
           $ref: '#/components/responses/500'
-      deprecated: false
   /47/test_id_min/{an_id}:
     get:
       operationId: testIdMin
@@ -50,7 +47,6 @@ paths:
         description: An ID
         in: path
         required: true
-        deprecated: false
         schema:
           $ref: '#/components/schemas/int.min4'
       responses:
@@ -60,7 +56,6 @@ paths:
             x-prize:
               description: free money
               required: false
-              deprecated: false
               allowEmptyValue: false
               explode: false
               allowReserved: false
@@ -78,7 +73,6 @@ paths:
           $ref: '#/components/responses/410'
         '500':
           $ref: '#/components/responses/500'
-      deprecated: false
   /55/test_id_examples/{an_id}:
     get:
       summary: A path with parameter examples
@@ -95,7 +89,6 @@ paths:
         description: An ID
         in: path
         required: true
-        deprecated: false
         schema:
           exclusiveMaximum: false
           minimum: 4
@@ -107,7 +100,6 @@ paths:
           nullable: false
           readOnly: false
           writeOnly: false
-          deprecated: false
         examples:
           small:
             summary: A small number
@@ -134,7 +126,6 @@ paths:
           $ref: '#/components/responses/410'
         '500':
           $ref: '#/components/responses/500'
-      deprecated: false
   /74/test_path__deprecated/{an_id}/{another}:
     get:
       summary: A path with parameter examples
@@ -145,7 +136,6 @@ paths:
         description: An ID
         in: path
         required: true
-        deprecated: false
         schema:
           exclusiveMaximum: false
           minimum: 4
@@ -157,7 +147,6 @@ paths:
           nullable: false
           readOnly: false
           writeOnly: false
-          deprecated: false
         examples:
           small:
             summary: A small number
@@ -170,7 +159,6 @@ paths:
       - name: another
         in: path
         required: true
-        deprecated: false
         schema:
           exclusiveMaximum: false
           exclusiveMinimum: false
@@ -179,7 +167,6 @@ paths:
           nullable: false
           readOnly: false
           writeOnly: false
-          deprecated: false
       responses:
         '200':
           $ref: '#/components/responses/200'
@@ -217,7 +204,6 @@ paths:
           nullable: false
           readOnly: false
           writeOnly: false
-          deprecated: false
       responses:
         '200':
           $ref: '#/components/responses/200'
@@ -235,7 +221,6 @@ paths:
           $ref: '#/components/responses/410'
         '500':
           $ref: '#/components/responses/500'
-      deprecated: false
   /109/some_ids:
     get:
       operationId: testSomeIds
@@ -244,7 +229,6 @@ paths:
         description: Some IDs
         in: query
         required: true
-        deprecated: false
         schema:
           exclusiveMaximum: false
           exclusiveMinimum: false
@@ -258,11 +242,16 @@ paths:
           - 13
           type: array
           items:
+            exclusiveMaximum: false
+            exclusiveMinimum: false
+            uniqueItems: false
             type: integer
+            nullable: false
+            readOnly: false
+            writeOnly: false
           nullable: false
           readOnly: false
           writeOnly: false
-          deprecated: false
       responses:
         '200':
           $ref: '#/components/responses/200'
@@ -280,7 +269,6 @@ paths:
           $ref: '#/components/responses/410'
         '500':
           $ref: '#/components/responses/500'
-      deprecated: false
   /123/post_some_ids:
     post:
       operationId: testPostSomeIds
@@ -289,7 +277,6 @@ paths:
         description: Some IDs
         in: query
         required: true
-        deprecated: false
         schema:
           exclusiveMaximum: false
           exclusiveMinimum: false
@@ -303,11 +290,16 @@ paths:
           - 13
           type: array
           items:
+            exclusiveMaximum: false
+            exclusiveMinimum: false
+            uniqueItems: false
             type: integer
+            nullable: false
+            readOnly: false
+            writeOnly: false
           nullable: false
           readOnly: false
           writeOnly: false
-          deprecated: false
       responses:
         '200':
           $ref: '#/components/responses/200'
@@ -325,7 +317,6 @@ paths:
           $ref: '#/components/responses/410'
         '500':
           $ref: '#/components/responses/500'
-      deprecated: false
   /137/put_some_ids:
     put:
       operationId: testPutSomeIds
@@ -334,7 +325,6 @@ paths:
         description: Some IDs
         in: query
         required: true
-        deprecated: false
         schema:
           exclusiveMaximum: false
           exclusiveMinimum: false
@@ -348,11 +338,16 @@ paths:
           - 13
           type: array
           items:
+            exclusiveMaximum: false
+            exclusiveMinimum: false
+            uniqueItems: false
             type: integer
+            nullable: false
+            readOnly: false
+            writeOnly: false
           nullable: false
           readOnly: false
           writeOnly: false
-          deprecated: false
       responses:
         '200':
           $ref: '#/components/responses/200'
@@ -370,7 +365,6 @@ paths:
           $ref: '#/components/responses/410'
         '500':
           $ref: '#/components/responses/500'
-      deprecated: false
   /151/options_some_ids:
     options:
       operationId: testOptionsSomeIds
@@ -379,7 +373,6 @@ paths:
         description: Some IDs
         in: query
         required: true
-        deprecated: false
         schema:
           exclusiveMaximum: false
           exclusiveMinimum: false
@@ -393,11 +386,16 @@ paths:
           - 13
           type: array
           items:
+            exclusiveMaximum: false
+            exclusiveMinimum: false
+            uniqueItems: false
             type: integer
+            nullable: false
+            readOnly: false
+            writeOnly: false
           nullable: false
           readOnly: false
           writeOnly: false
-          deprecated: false
       responses:
         '200':
           $ref: '#/components/responses/200'
@@ -415,7 +413,6 @@ paths:
           $ref: '#/components/responses/410'
         '500':
           $ref: '#/components/responses/500'
-      deprecated: false
   /165/delete_some_ids:
     delete:
       operationId: testDeleteSomeIds
@@ -424,7 +421,6 @@ paths:
         description: Some IDs
         in: query
         required: true
-        deprecated: false
         schema:
           exclusiveMaximum: false
           exclusiveMinimum: false
@@ -438,11 +434,16 @@ paths:
           - 13
           type: array
           items:
+            exclusiveMaximum: false
+            exclusiveMinimum: false
+            uniqueItems: false
             type: integer
+            nullable: false
+            readOnly: false
+            writeOnly: false
           nullable: false
           readOnly: false
           writeOnly: false
-          deprecated: false
       responses:
         '200':
           $ref: '#/components/responses/200'
@@ -460,7 +461,6 @@ paths:
           $ref: '#/components/responses/410'
         '500':
           $ref: '#/components/responses/500'
-      deprecated: false
   /179/head_some_ids:
     head:
       operationId: testHeadSomeIds
@@ -469,7 +469,6 @@ paths:
         description: Some IDs
         in: query
         required: true
-        deprecated: false
         schema:
           exclusiveMaximum: false
           exclusiveMinimum: false
@@ -483,11 +482,16 @@ paths:
           - 13
           type: array
           items:
+            exclusiveMaximum: false
+            exclusiveMinimum: false
+            uniqueItems: false
             type: integer
+            nullable: false
+            readOnly: false
+            writeOnly: false
           nullable: false
           readOnly: false
           writeOnly: false
-          deprecated: false
       responses:
         '200':
           $ref: '#/components/responses/200'
@@ -505,7 +509,6 @@ paths:
           $ref: '#/components/responses/410'
         '500':
           $ref: '#/components/responses/500'
-      deprecated: false
   /194/patch_some_ids:
     patch:
       operationId: testPatchSomeIds
@@ -514,7 +517,6 @@ paths:
         description: Some IDs
         in: query
         required: true
-        deprecated: false
         schema:
           exclusiveMaximum: false
           exclusiveMinimum: false
@@ -528,11 +530,16 @@ paths:
           - 13
           type: array
           items:
+            exclusiveMaximum: false
+            exclusiveMinimum: false
+            uniqueItems: false
             type: integer
+            nullable: false
+            readOnly: false
+            writeOnly: false
           nullable: false
           readOnly: false
           writeOnly: false
-          deprecated: false
       responses:
         '200':
           $ref: '#/components/responses/200'
@@ -550,11 +557,9 @@ paths:
           $ref: '#/components/responses/410'
         '500':
           $ref: '#/components/responses/500'
-      deprecated: false
 components:
   schemas:
     int.min4:
-      deprecated: false
       description: 'Minimum: 4'
       exclusiveMaximum: false
       exclusiveMinimum: false
@@ -567,7 +572,6 @@ components:
       uniqueItems: false
       writeOnly: false
     str.min4:
-      deprecated: false
       description: A string of len >= 4
       exclusiveMaximum: false
       exclusiveMinimum: false

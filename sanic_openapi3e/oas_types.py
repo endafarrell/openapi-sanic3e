@@ -148,7 +148,7 @@ class OObject:
         return value
 
     @staticmethod
-    def _as_yamlable_dict(
+    def _as_yamlable_object(
         value: Any, sort=False, opt_key: Optional[str] = None
     ) -> Union[Dict, str, bytes, int, float, List]:
         if isinstance(value, OObject):
@@ -158,13 +158,13 @@ class OObject:
         if isinstance(value, list):
             if sort:
                 value = sorted(value)
-            return [OObject._as_yamlable_dict(v, sort=sort, opt_key=opt_key) for v in value]
+            return [OObject._as_yamlable_object(v, sort=sort, opt_key=opt_key) for v in value]
         if isinstance(value, (dict, OrderedDict)):
             items = list(value.items())
             if sort:
                 items = sorted(items)
             return {
-                key2: OObject._as_yamlable_dict(value2, sort=sort, opt_key=f"{opt_key}.{key2}")
+                key2: OObject._as_yamlable_object(value2, sort=sort, opt_key=f"{opt_key}.{key2}")
                 for key2, value2 in items
             }
         if isinstance(value, tuple) and str(opt_key).endswith("paths"):
@@ -175,14 +175,15 @@ class OObject:
 
     def as_yamlable_object(  # pylint: disable=too-many-branches
         self, sort=False, opt_key: Optional[str] = None
-    ) -> Union[Dict, str, bytes, int, float, List]:
+    ) -> Dict:
         _repr = {}
 
         if not hasattr(self, "__dict__"):
             raise TypeError(repr(self))
 
         for key, value in self.__dict__.items():
-            if not value and not isinstance(value, bool):
+            # Allow False bools, but not other falsy values
+            if (value is not False) and (not value):
                 continue
             if key.startswith("x_"):
                 continue
@@ -203,7 +204,7 @@ class OObject:
                 }
             elif key2 == "security":
                 value2 = [
-                    SecurityRequirement._as_yamlable_dict(  # pylint: disable=protected-access
+                    SecurityRequirement._as_yamlable_object(  # pylint: disable=protected-access
                         sr, opt_key=f"{opt_key}.{key2}"
                     )
                     for sr in value
@@ -211,22 +212,24 @@ class OObject:
 
             elif key2 == "schemas":
                 # Everyone wants sorted schema entries!
-                value2 = OObject._as_yamlable_dict(value, sort=True, opt_key=f"{opt_key}.{key2}")
+                value2 = OObject._as_yamlable_object(value, sort=True, opt_key=f"{opt_key}.{key2}")
             elif key2 == "paths":
                 value2 = {
-                    uri: OObject._as_yamlable_dict(
+                    uri: OObject._as_yamlable_object(
                         path_item, opt_key=f"{opt_key}.{uri}"
                     )
                     for uri, path_item in value._paths
                 }
-
             elif key2 == "examples":
                 value2 = {
-                    key3: OObject._as_yamlable_dict(value3, opt_key=f"{opt_key}.{key2}")
+                    key3: OObject._as_yamlable_object(value3, opt_key=f"{opt_key}.{key2}")
                     for key3, value3 in value.items()
                 }
+            elif key2 == "deprecated" and not value:
+                # By default, items in specs are `deprecated: false` - these are not desirable in the specs
+                continue
             else:
-                value2 = OObject._as_yamlable_dict(value, opt_key=f"{opt_key}.{key2}")
+                value2 = OObject._as_yamlable_object(value, opt_key=f"{opt_key}.{key2}")
             if not value and not isinstance(value, bool):
                 continue
             _repr[key2] = value2
@@ -245,39 +248,56 @@ class OObject:
         :return: A dict serialisation of self.
         :rtype: OrderedDict
         """
-        _repr = OrderedDict()  # type: OrderedDict[str, Union[Dict, List]]
-        for key, value in self.__dict__.items():
-
-            if callable(value):
-                continue
-            if not value and not isinstance(value, bool):
-                continue
-            if key.startswith("x_") and not for_repr:
-                continue
-            key2 = openapi_keyname(key)
-            value2: Union[Dict, List]
-            if key2 == "parameters" and self.__class__.__qualname__ in ("PathItem", "Operation",):
-                value2 = list(OObject._serialize(e, for_repr=for_repr, sort=sort) for e in value)
-            elif key2 == "security":
-                value2 = list(
-                    SecurityRequirement._serialize(sr, for_repr=for_repr)  # pylint: disable=protected-access
-                    for sr in value
-                )
-            elif key2 == "schemas":
-                # Everyone wants sorted schema entries!
-                value2 = OObject._serialize(value, sort=True)
-            else:
-                value2 = OObject._serialize(value)
-            if not value2 or callable(value2):
-
-                continue
-
-            _repr[key2] = value2
-        if sort:
-            _sorted_repr = OrderedDict()
-            for key in sorted(_repr.keys()):
-                _sorted_repr[key] = _repr[key]
-        return _repr
+        # _repr = OrderedDict()  # type: OrderedDict[str, Union[Dict, List]]
+        # for key, value in self.__dict__.items():
+        #
+        #     if callable(value):
+        #         continue
+        #     if not value and not isinstance(value, bool):
+        #         continue
+        #     if key.startswith("x_") and not for_repr:
+        #         continue
+        #     key2 = openapi_keyname(key)
+        #     value2: Union[Dict, List]
+        #     if key2 == "parameters" and self.__class__.__qualname__ in ("PathItem", "Operation",):
+        #         value2 = list(OObject._serialize(e, for_repr=for_repr, sort=sort) for e in value)
+        #     elif key2 == "security":
+        #         value2 = list(
+        #             SecurityRequirement._serialize(sr, for_repr=for_repr)  # pylint: disable=protected-access
+        #             for sr in value
+        #         )
+        #     elif key2 == "schemas":
+        #         # Everyone wants sorted schema entries!
+        #         value2 = OObject._serialize(value, sort=True)
+        #     else:
+        #         value2 = OObject._serialize(value)
+        #     if not value2 or callable(value2):
+        #
+        #         continue
+        #
+        #     _repr[key2] = value2
+        # if sort:
+        #     _sorted_repr = OrderedDict()
+        #     for key in sorted(_repr.keys()):
+        #         _sorted_repr[key] = _repr[key]
+        # return _repr
+        yamable = self.as_yamlable_object(sort=sort)
+        # if self.__class__.__qualname__ == "OpenAPIv3":
+        #     print(278)
+        #     # There is special ordering for this
+        #     _repr = OrderedDict()
+        #     _repr["openapi"] = getattr(self, "version")
+        #     for key in ("info", "servers", "paths", "components", "security", "tags" "externalDocs"):
+        #         _value = yamable.get(key)
+        #         if key == "tags":
+        #             print(284, _value)
+        #         if _value:
+        #             _repr[key] = _value
+        #
+        # else:
+        #     _repr = OrderedDict(yamable)
+        # return _repr
+        return OrderedDict(yamable)
 
     def __str__(self):
         return json.dumps(self.serialize(), sort_keys=True)
@@ -2831,7 +2851,8 @@ class SecurityRequirement(OObject):  # pylint: disable=missing-function-docstrin
         return repr(self.__dict__)
 
     def serialize(self, for_repr=False, sort=False):
-        return self.__dict__
+        raise NotImplementedError(sef)
+        # return self.__dict__
 
     def __len__(self):
         return len(self.__dict__)
@@ -3262,11 +3283,15 @@ class Paths(OObject):
 
         :return: A dict serialisation of self.
         """
+        if self:
+            raise NotImplementedError()
         serialised = OrderedDict()
         for (uri, path_item) in self._paths:
             # Until the spec is being built, these `uri` are the decorated methods in your `app` or blueprints.
             serialised[uri] = path_item.serialize(sort=sort)
+            print(3285, serialised[uri])
         if sort:
+            print(3287)
             _sorted_repr = OrderedDict()
             for key in sorted(serialised.keys()):
                 _sorted_repr[key] = serialised[key]
