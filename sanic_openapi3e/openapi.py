@@ -159,7 +159,7 @@ def _build_openapi_spec(  # pylint: disable=too-many-arguments, too-many-locals
     security = _build_openapi_security(app)
     external_docs = _build_openapi_externaldocs(app)
 
-    openapi = OpenAPIv3(
+    return OpenAPIv3(
         openapi=OpenAPIv3.version,
         info=info,
         paths=_v3_paths,
@@ -169,28 +169,25 @@ def _build_openapi_spec(  # pylint: disable=too-many-arguments, too-many-locals
         tags=_v3_tags,
         external_docs=external_docs,
     )
-    return openapi
 
 
 def _build_openapi_components(app):
     components = app.config.get("OPENAPI_COMPONENTS")
-    if components:
-        if not isinstance(components, Components):
-            raise AssertionError(
-                "You app.config's `OPENAPI_COMPONENTS` is not a `Components`: {}".format(type(components))
-            )
+    if components and not isinstance(components, Components):
+        raise AssertionError(
+            "You app.config's `OPENAPI_COMPONENTS` is not a `Components`: {}".format(type(components))
+        )
     return components
 
 
 def _build_openapi_externaldocs(app):
     external_docs = app.config.get("OPENAPI_EXTERNAL_DOCS")
-    if external_docs:
-        if not isinstance(external_docs, ExternalDocumentation):
-            raise AssertionError(
-                "You app.config's `OPENAPI_EXTERNAL_DOCS` is not a `ExternalDocumentation`: {}".format(
-                    type(external_docs)
-                )
+    if external_docs and not isinstance(external_docs, ExternalDocumentation):
+        raise AssertionError(
+            "You app.config's `OPENAPI_EXTERNAL_DOCS` is not a `ExternalDocumentation`: {}".format(
+                type(external_docs)
             )
+        )
     return external_docs
 
 
@@ -229,7 +226,7 @@ def _build_openapi_servers(app):
 
 
 def _buld_openapi_info(app, contact, _license):
-    info = Info(
+    return Info(
         title=app.config.get("API_TITLE", "API"),
         description=app.config.get("API_DESCRIPTION", "Description"),
         terms_of_service=app.config.get("API_TERMS_OF_SERVICE_URL"),
@@ -237,7 +234,6 @@ def _buld_openapi_info(app, contact, _license):
         _license=_license,
         version=app.config.get("API_VERSION", "v1.0.0"),
     )
-    return info
 
 
 def _build_openapi_license(app):
