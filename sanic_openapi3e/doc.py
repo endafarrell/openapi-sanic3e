@@ -29,6 +29,19 @@ def exclude():
     return inner
 
 
+def external_docs(url: str, description: Optional[str] = None):  # pylint: disable=redefined-outer-name
+    """
+    Add an externalDoc to the route. Note that some UIs do not show route/operation external_docs.
+    """
+
+    def inner(func):
+
+        endpoints[func].x_external_docs_holder = ExternalDocumentation(url, description=description)
+        return func
+
+    return inner
+
+
 def description(text: str):
     """
     Add a description to the route by marking them `@doc.description("Descriptive text")`

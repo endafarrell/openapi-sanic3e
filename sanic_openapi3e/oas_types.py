@@ -127,23 +127,23 @@ NoneType = type(None)
 class OObject:
     """A base object for sanic_openapi3e. Internal."""
 
-    @staticmethod
-    def _serialize(value: Any, for_repr=False, sort=False) -> Union[Dict, List[Dict], Any]:
-        """
-        Internal serialisation to a dict
-        :param value: Any
-        :return: dict
-        """
-        if isinstance(value, OObject):
-            return value.serialize(sort=sort)
-
-        if isinstance(value, dict):
-            return {openapi_keyname(k): OObject._serialize(v, for_repr=for_repr, sort=sort) for k, v in value.items()}
-
-        if isinstance(value, list):
-            return [OObject._serialize(v, for_repr=for_repr, sort=sort) for v in value]
-
-        return value
+    # @staticmethod
+    # def _serialize(value: Any, for_repr=False, sort=False) -> Union[Dict, List[Dict], Any]:
+    #     """
+    #     Internal serialisation to a dict
+    #     :param value: Any
+    #     :return: dict
+    #     """
+    #     if isinstance(value, OObject):
+    #         return value.serialize(sort=sort)
+    #
+    #     if isinstance(value, dict):
+    #         return {openapi_keyname(k): OObject._serialize(v, for_repr=for_repr, sort=sort) for k, v in value.items()}
+    #
+    #     if isinstance(value, list):
+    #         return [OObject._serialize(v, for_repr=for_repr, sort=sort) for v in value]
+    #
+    #     return value
 
     @staticmethod
     def _as_yamlable_object(
@@ -165,9 +165,6 @@ class OObject:
                 key2: OObject._as_yamlable_object(value2, sort=sort, opt_key=f"{opt_key}.{key2}")
                 for key2, value2 in items
             }
-        if isinstance(value, tuple) and str(opt_key).endswith("paths"):
-            # Note - explicitly not sorting here ...
-            return {value[0]: value[1].as_yamlable_object(sort=False, opt_key=f"{opt_key}.{value[0]}")}
 
         raise TypeError(f"{type(value)}, value={value} opt_key={opt_key}")
 
@@ -177,7 +174,7 @@ class OObject:
         _repr = {}
 
         if not hasattr(self, "__dict__"):
-            raise TypeError(repr(self))
+            raise TypeError(str(opt_key) + " " + self.__class__.__qualname__ + " " + repr(self))
 
         for key, value in self.__dict__.items():
             # Allow False bools, but not other falsy values
@@ -221,17 +218,20 @@ class OObject:
             # paths are a special case
             elif key2 == "paths":
                 value2 = {
-                    uri: OObject._as_yamlable_object(path_item, opt_key=f"{opt_key}.{uri}")
+                    uri: OObject.as_yamlable_object(path_item, opt_key=f"{opt_key}.{uri}")
                     for uri, path_item in value._paths  # pylint: disable=protected-access
                 }
             ############################################################################################################
             # sort the schemas
             elif key2 == "schemas":
-                # Everyone wants sorted schema entries!
+                # Everyone wants sorted schema entries! Note that as `dict`s, they require OObject._as_yamlable_object
                 value2 = OObject._as_yamlable_object(value, sort=True, opt_key=f"{opt_key}.{key2}")
             ############################################################################################################
-            # default
+            # default - for known OObjects
+            elif isinstance(value, OObject) and hasattr(value, "__dict__"):
+                value2 = OObject.as_yamlable_object(value, sort=sort, opt_key=f"{opt_key}.{key}")
             else:
+                # Note how this uses the OObject._as_yamlable_object
                 value2 = OObject._as_yamlable_object(value, opt_key=f"{opt_key}.{key2}")
 
             _repr[key2] = value2
@@ -898,7 +898,7 @@ class Header(OObject):  # pylint: disable=too-many-instance-attributes
         _assert_type(schema, (Schema, Reference), "schema", self.__class__)
         # Note: examples is specified to be "Any"
         _assert_type(examples, (dict,), "examples", self.__class__)
-        _assert_type(content, (MediaType,), "content", self.__class__)
+        _assert_type(content, (dict,), "content", self.__class__)
 
         # Validations.
         assert not (example and examples)
@@ -911,11 +911,11 @@ class Header(OObject):  # pylint: disable=too-many-instance-attributes
                         )
                     )
         if content:
-            if len(content) != 1:
+            if len(list(content.values())) != 1:
                 raise AssertionError("For `{}.content` MUST only contain one entry".format(self.__class__.__qualname__))
             for c_name, media_type in content.items():
-                if not isinstance(c_name, MediaType):
-                    raise AssertionError(
+                if not isinstance(media_type, MediaType):
+                    raise TypeError(
                         "For `{}.content`, values must be a `MediaType`. For {} it is a {}".format(
                             self.__class__.__qualname__, c_name, type(media_type)
                         )
@@ -2441,8 +2441,8 @@ class SecurityScheme(OObject):  # pylint: disable=too-many-instance-attributes
         name: str,
         _in: str,
         scheme: str,
-        flows: OAuthFlows,
-        openid_connect_url: str,
+        flows: Optional[OAuthFlows] = None,
+        openid_connect_url: Optional[str] = None,
         description: Optional[str] = None,
         bearer_format=None,
     ):
@@ -2469,16 +2469,16 @@ class SecurityScheme(OObject):  # pylint: disable=too-many-instance-attributes
             Authorization header as defined in RFC7235.
         :param bearer_format: A hint to the client to identify how the bearer token is formatted. Bearer tokens are
             usually generated by an authorization server, so this information is primarily for documentation purposes.
-        :param flows: REQUIRED (but not checked). An object containing configuration information for the flow types
-            supported.
-        :param openid_connect_url: REQUIRED (but not checked). OpenId Connect URL to discover OAuth2 configuration
-            values. This MUST be in the form of a URL.
+        :param flows: REQUIRED when `_type` is `oauth2`. An object containing configuration information for the flow
+            types supported.
+        :param openid_connect_url: REQUIRED when `_type` is `openIdConnect`. OpenId Connect URL to discover OAuth2
+            configuration values. This MUST be in the form of a URL.
         """
         # TODO - types
 
         assert _type in {"apiKey", "http", "oauth2", "openIdConnect"}
         if _in:
-            assert _in in {"query", "header", "cookie"}
+            assert _in in {"query", "header", "cookie"}, _in
 
         self._type = _type
         """
@@ -2507,12 +2507,14 @@ class SecurityScheme(OObject):  # pylint: disable=too-many-instance-attributes
         """
 
         self.flows = flows
-        """REQUIRED (but not checked). An object containing configuration information for the flow types supported."""
+        """
+        REQUIRED when _type is oauth2. An object containing configuration information for the flow types supported.
+        """
 
         self.openid_connect_url = openid_connect_url
         """
-        REQUIRED (but not checked). OpenId Connect URL to discover OAuth2 configuration values. This MUST be in the form 
-        of a URL.
+        REQUIRED when _type is openIdConnect. OpenId Connect URL to discover OAuth2 configuration values. This MUST be 
+        in the form of a URL.
         """
 
 
@@ -3107,6 +3109,7 @@ class PathItem(OObject):  # pylint: disable=too-many-instance-attributes
         # TODO = add hide/suppress?
         x_tags_holder: Optional[List[Tag]] = None,
         x_deprecated_holder: bool = False,
+        x_external_docs_holder: Optional[ExternalDocumentation] = None,
         x_responses_holder: Optional[Dict[str, Union[Response, Reference]]] = None,
         x_exclude: bool = False,
     ):
@@ -3140,11 +3143,14 @@ class PathItem(OObject):  # pylint: disable=too-many-instance-attributes
             passed to the Operation/s.
         :param x_deprecated_holder: sanic-openapi3e implementation extension to allow deprecated on the PathItem until
             they can be passed to the Operation/s.
+        :param x_external_docs_holder: sanic-openapi3e implementation extension to allow externalDocs on the PathItem
+            until they can be passed to the Operation/s.
         :param x_responses_holder: sanic-openapi3e implementation extension to allow Responses on the PathItem until
             they can be passed to the Operation/s.
         :param x_exclude: sanic-openapi3e extension to completly exclude the path from the spec.
         """
-        # TODO  - types
+        if x_external_docs_holder:
+            raise ValueError(x_external_docs_holder)
 
         # TODO - validations
         if x_tags_holder:
@@ -3205,9 +3211,11 @@ class PathItem(OObject):  # pylint: disable=too-many-instance-attributes
         """
 
         self.request_body = request_body
+
         self.x_tags_holder: List[Tag] = x_tags_holder if x_tags_holder is not None else []
         self.x_deprecated_holder = x_deprecated_holder
         self.x_responses_holder: Responses = Responses(x_responses_holder)
+        self.x_external_docs_holder = x_external_docs_holder
         self.x_exclude = x_exclude
 
     def x_operations(self) -> List[Operation]:

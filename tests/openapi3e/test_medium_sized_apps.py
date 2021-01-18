@@ -209,9 +209,10 @@ def create_medium_sized_app_00(sanic_name: str, doc, openapi_blueprint):
     return app
 
 
-if __name__ == "__main__":
-    from sanic_openapi3e import doc, openapi_blueprint, swagger_blueprint
-
-    app = create_medium_sized_app_00(doc, openapi_blueprint)
-    app.blueprint(swagger_blueprint)
-    app.go_fast()
+# Sometimes really useful ;-)
+# if __name__ == "__main__":
+#     from sanic_openapi3e import doc, openapi_blueprint, swagger_blueprint
+#
+#     app = create_medium_sized_app_00(doc, openapi_blueprint)
+#     app.blueprint(swagger_blueprint)
+#     app.go_fast()

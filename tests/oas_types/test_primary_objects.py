@@ -3,7 +3,15 @@ from typing import Set
 import sanic.response
 from sanic import Sanic
 
-from sanic_openapi3e.oas_types import Contact, License, PathItem, Paths, Schema, Tag
+from sanic_openapi3e.oas_types import (
+    Contact,
+    ExternalDocumentation,
+    License,
+    PathItem,
+    Paths,
+    Schema,
+    Tag,
+)
 
 ########################################################################################################################
 # Contact
@@ -24,6 +32,70 @@ def test_contact():
         "url": "www.url.com",
         "email": "email@url.com",
     }
+
+
+def test_external_documentation(openapi__mod_bp_doc):
+    _, openapi_blueprint, doc = openapi__mod_bp_doc
+    app = Sanic("test_external_documentation", strict_slashes=strict_slashes)
+    app.config.OPENAPI_EXTERNAL_DOCS = ExternalDocumentation("http://wikipedia.org/", description="Fabulous resource")
+
+    app.blueprint(openapi_blueprint)
+
+    @app.get("/examples/44/test_external_docs/<an_id:int>")
+    @doc.parameter(
+        name="an_id", description="An ID", required=True, _in="path", schema=Schema.Integer,
+    )
+    @doc.summary("A path with docs")
+    @doc.description("The route should have extra docs")
+    @doc.external_docs("https://tools.ietf.org/html/rfc2616", description="HTTP1.1 RFC")
+    def param__deprecated(request, an_id: int):
+        return sanic.response.json(locals())  # pragma: no cover
+
+    _, response = app.test_client.get("/openapi/spec.json")
+    expected = {
+        "externalDocs": {"description": "Fabulous resource", "url": "http://wikipedia.org/"},
+        "info": {"description": "Description", "title": "API", "version": "v1.0.0"},
+        "openapi": "3.0.2",
+        "paths": {
+            "/examples/44/test_external_docs/{an_id}": {
+                "get": {
+                    "description": "The route should have extra docs",
+                    "externalDocs": {"description": "HTTP1.1 RFC", "url": "https://tools.ietf.org/html/rfc2616"},
+                    "operationId": "GET~~~examples~44~test_external_docs~an_id",
+                    "parameters": [
+                        {
+                            "description": "An ID",
+                            "in": "path",
+                            "name": "an_id",
+                            "required": true,
+                            "schema": {
+                                "exclusiveMaximum": false,
+                                "exclusiveMinimum": false,
+                                "nullable": false,
+                                "readOnly": false,
+                                "type": "integer",
+                                "uniqueItems": false,
+                                "writeOnly": false,
+                            },
+                        }
+                    ],
+                    "responses": {
+                        "200": {"$ref": "#/components/responses/200"},
+                        "400": {"$ref": "#/components/responses/400"},
+                        "401": {"$ref": "#/components/responses/401"},
+                        "403": {"$ref": "#/components/responses/403"},
+                        "404": {"$ref": "#/components/responses/404"},
+                        "405": {"$ref": "#/components/responses/405"},
+                        "410": {"$ref": "#/components/responses/410"},
+                        "500": {"$ref": "#/components/responses/500"},
+                    },
+                    "summary": "A path with docs",
+                }
+            }
+        },
+    }
+
+    run_asserts(response, expected)
 
 
 ########################################################################################################################

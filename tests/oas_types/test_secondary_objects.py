@@ -4,8 +4,14 @@ from sanic_openapi3e.oas_types import (
     XML,
     Contact,
     Discriminator,
+    Encoding,
+    Example,
+    Header,
+    Link,
+    MediaType,
     OAuthFlow,
     OAuthFlows,
+    SecurityScheme,
     ServerVariable,
 )
 
@@ -21,6 +27,67 @@ def test_discriminator():
 
     with pytest.raises(AssertionError):
         Discriminator(property_name="name", mapping={"first": "FirstName", "last": "LastName", "contact": Contact})
+
+
+########################################################################################################################
+# Encoding
+########################################################################################################################
+
+
+def test_encoding():
+    assert Encoding(content_type="text/plain").as_yamlable_object() == {
+        "allowReserved": False,
+        "contentType": "text/plain",
+        "explode": False,
+    }
+
+
+########################################################################################################################
+# Header
+########################################################################################################################
+
+
+def test_header():
+    assert Header().as_yamlable_object() == {
+        "allowEmptyValue": False,
+        "allowReserved": False,
+        "explode": False,
+        "required": False,
+    }
+    assert Header(content={"text/plain": MediaType(example="Bearer ....token...")}).as_yamlable_object() == {
+        "allowEmptyValue": False,
+        "allowReserved": False,
+        "content": {"text/plain": {"example": "Bearer ....token..."}},
+        "explode": False,
+        "required": False,
+    }
+
+    with pytest.raises(AssertionError):
+        Header(example="an example", examples={"a": Example(description="a"), "b": Example(description="b")})
+
+    with pytest.raises(AssertionError):
+        # noinspection PyTypeChecker
+        assert Header(examples={"a": 2})
+
+    with pytest.raises(TypeError):
+        # noinspection PyTypeChecker
+        assert Header(content={"a": 2})
+
+    with pytest.raises(AssertionError):
+        media_type = MediaType()
+        # noinspection PyTypeChecker
+        assert Header(content={"a": media_type, "b": media_type})
+
+
+########################################################################################################################
+# Link
+########################################################################################################################
+
+
+def test_link():
+    assert Link(operation_id="getDetailsForUser").as_yamlable_object() == {
+        "operationId": "getDetailsForUser",
+    }
 
 
 ########################################################################################################################
@@ -40,6 +107,17 @@ def test_oauthflows_keys_casing__issue9():
             "scopes": {"scope1": "", "scope2": ""},
         }
     }
+
+
+########################################################################################################################
+# SecurityScheme
+########################################################################################################################
+
+
+def test_security_scheme():
+    assert SecurityScheme(
+        _type="http", name="Authorization", _in="header", flows=None, openid_connect_url=None, scheme="Bearer"
+    ).as_yamlable_object() == {"in": "header", "name": "Authorization", "scheme": "Bearer", "type": "http"}
 
 
 ########################################################################################################################

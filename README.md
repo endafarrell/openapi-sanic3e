@@ -430,7 +430,7 @@ Contact | production/stable |  |
 Discriminator | beta | no known usage
 Encoding | stable | no known usage |
 Example | production/stable |  |
-ExternalDocumentation | beta | no known usage
+ExternalDocumentation | production/stable |  |
 Header | beta | no known usage
 Info | production/stable |  |
 License | production/stable |  |
