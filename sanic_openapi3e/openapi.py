@@ -327,7 +327,7 @@ def _buld_openapi_paths(  # pylint: disable=too-many-arguments,too-many-locals,t
 
             path_item_summary: Optional[str] = path_item.summary
             if path_item.x_exclude and not hide_excluded:
-                path_item_summary = "[excluded] " + (path_item.summary if path_item.summary else "")
+                path_item_summary = "[excluded] " + (path_item.summary or "")
 
             _op_parameters = _build_openapi_paths_opparameters(path_item, route_parameters, components)
             pathitem_tag_names: Set[str] = _build_openapi_paths_operations_tagnames(app, path_item, _func)
@@ -371,13 +371,8 @@ def _build_openapi_paths_operations_should_be_skipped(  # pylint: disable=too-ma
         return True
     if str(handler_func.__module__) == "sanic.static" and hide_sanic_static:
         return True
-    if cloak_fn:
-        cloak = cloak_fn(method, uri, route)
-    else:
-        cloak = False
-    if cloak and hide_cloaked:
-        return True
-    return False
+    cloak = cloak_fn(method, uri, route) if cloak_fn else False
+    return bool(cloak and hide_cloaked)
 
 
 def _build_openapi_paths_opparameters(
@@ -425,8 +420,12 @@ def _upgrade_parameter_schema_description(
 def _build_openapi_path_should_be_skipped(_uri: str, hide_excluded: bool, hide_openapi_self: bool):
 
     if hide_openapi_self:
-        if (_uri.startswith("/" + blueprint.url_prefix) if blueprint.url_prefix else True) and any(
-            [bp_uri in _uri for bp_uri in [r.uri for r in blueprint.routes]]
+        if (
+            _uri.startswith("/" + blueprint.url_prefix)
+            if blueprint.url_prefix
+            else True
+        ) and any(
+            bp_uri in _uri for bp_uri in [r.uri for r in blueprint.routes]
         ):
             # Remove self-documentation from the spec
             return True
@@ -435,9 +434,7 @@ def _build_openapi_path_should_be_skipped(_uri: str, hide_excluded: bool, hide_o
         ):
             # Remove self-documentation from the spec by not adding.
             return True
-    if "<file_uri" in _uri and hide_excluded:
-        return True
-    return False
+    return "<file_uri" in _uri and hide_excluded
 
 
 def _build_openapi_paths_routeparameters_and_uri(_route, _uri: str) -> Tuple[List[Parameter], str]:
