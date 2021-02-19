@@ -466,6 +466,8 @@ Callback | none | not implemented
 specs. 
 
 ## Changelog
+* v0.9.10
+  * Adds CORS `Access-Control-Allow-Origin: *` headers to the OpenAPI `/openapi/spec*` endpoints. 
 * v0.9.9
   * Fixes type validation bug for `oneOf`.
 * v0.9.8
@@ -481,8 +483,8 @@ specs.
   * Adds a `@doc.responses()` to give an easier way of documenting a route.
 * v0.9.3
   * Adds a `@doc.security()` to override security requirements on a route.
-  * Removes entries with `false` values from the spec if `false` is the default value. This makes the specs smaller in
-    size and are more idiomatic.
+  * Removes entries with `false` values from the spec if `false` is the default value. This makes the specs smaller and
+    are more idiomatic.
 * v0.9.2
   * Fixes an issue of rendering SecurityRequirement when there were no entries in the list.
   

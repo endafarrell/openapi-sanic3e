@@ -467,23 +467,23 @@ def _build_openapi_tags(_paths: List[Tuple[str, PathItem]], show_unused_tags: bo
 # ROUTES
 # ======================================================================================================================
 # spec.json & spec.yml
-@blueprint.route("/spec.json")
+@blueprint.route("/spec.json", methods=frozenset({"GET", "OPTIONS"}))
 async def spec_v3_json(_):
     return await serve_spec(_OPENAPI, "json")
 
 
-@blueprint.route("/spec.yml")
+@blueprint.route("/spec.yml", methods=frozenset({"GET", "OPTIONS"}))
 async def spec_v3_yaml(request: sanic.request.Request):
     as_text = "as_text" in request.query_string
     return await serve_spec(_OPENAPI, "yaml", as_text)
 
 
-@blueprint.route("/uncloaked.json")
+@blueprint.route("/uncloaked.json", methods=frozenset({"GET", "OPTIONS"}))
 async def spec_v3_uncloaked_json(_):
     return await serve_spec(_OPENAPI_UNCLOAKED, "json")
 
 
-@blueprint.route("/uncloaked.yml")
+@blueprint.route("/uncloaked.yml", methods=frozenset({"GET", "OPTIONS"}))
 async def spec_v3_uncloaked_yaml(request: sanic.request.Request):
     as_text = "as_text" in request.query_string
     return await serve_spec(_OPENAPI_UNCLOAKED, "yaml", as_text)
@@ -493,12 +493,12 @@ async def spec_v3_uncloaked_yaml(request: sanic.request.Request):
 # spec.all.json / spec.all.yml
 
 
-@blueprint.route("/spec.all.json")
+@blueprint.route("/spec.all.json", methods=frozenset({"GET", "OPTIONS"}))
 async def spec_all_json(_):
     return await serve_spec(_OPENAPI_ALL, "json")
 
 
-@blueprint.route("/spec.all.yml")
+@blueprint.route("/spec.all.yml", methods=frozenset({"GET", "OPTIONS"}))
 async def spec_all_yml(request: sanic.request.Request):
     as_text = "as_text" in request.query_string
     return await serve_spec(_OPENAPI_ALL, "yaml", as_text)
@@ -512,10 +512,12 @@ async def serve_spec(spec: Dict, json_yaml: str, yaml_as_text: bool = False):
         # ... including empty dicts in this if block
         raise sanic.exceptions.NotFound("Not found")
 
+    cors_headers = {"Access-Control-Allow-Origin": "*"}
     if json_yaml == "json":
-        return sanic.response.json(spec)
+        return sanic.response.json(spec, headers=cors_headers)
 
     return sanic.response.HTTPResponse(
         content_type="text/plain" if yaml_as_text else YAML_CONTENT_TYPE,
         body=yaml.dump(spec, Dumper=yaml.CDumper, default_flow_style=False, explicit_start=False, sort_keys=False),
+        headers=cors_headers
     )
